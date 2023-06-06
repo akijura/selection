@@ -1,0 +1,33 @@
+version: "3.9"
+services:
+  api:
+    container_name: selection
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - PROXY=http://172.25.113.50:8085
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_SOURCE=postgresql://akki:selection@localhost:5432/selection?sslmode=disable
+    depends_on:
+      - postgres
+    networks:
+      - selection_network
+    command: ["/app/main"]
+
+  postgres:
+    container_name: pgsql_selection
+    ports:
+      - 5496:5432
+    image: postgres:14.5-alpine
+    environment:
+      - POSTGRES_USER=akki
+      - POSTGRES_PASSWORD=selection
+      - POSTGRES_DB=selection
+    networks:
+      - selection_network
+networks:
+  selection_network:
+    driver: bridge
